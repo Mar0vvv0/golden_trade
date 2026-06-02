@@ -42,3 +42,4 @@ venv/
 *.sqlite
 *.sqlite3
 *.db
+data/cache/

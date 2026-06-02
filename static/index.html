@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A 股策略系统</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="control-panel">
+        <div class="brand">
+          <span class="brand-mark">R</span>
+          <div>
+            <h1>A 股策略系统</h1>
+            <p>选股 / 回测双工作台</p>
+          </div>
+        </div>
+
+        <nav class="page-tabs" aria-label="项目页">
+          <button class="page-tab active" type="button" data-page="screen-page">今日选股</button>
+          <button class="page-tab" type="button" data-page="backtest-page">策略回测</button>
+        </nav>
+
+        <section class="form-stack">
+          <label>选股策略
+            <select id="strategy">
+              <option value="zhuang_n2_weekly">庄股 N2 混沌期</option>
+              <option value="equal_weight">等权股票池</option>
+            </select>
+          </label>
+
+          <div class="universe-note">
+            <span>股票范围</span>
+            <strong id="universe-count">系统默认股票池</strong>
+          </div>
+
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="workspace-header">
+          <div>
+            <p class="eyebrow">Strategy workspace</p>
+            <h2 id="result-title">今日选股</h2>
+            <p id="screen-summary" class="screen-summary">选择策略后，系统自动从默认股票池里筛出符合条件的股票。</p>
+          </div>
+          <div id="status-pill" class="status-pill">Ready</div>
+        </header>
+
+        <section id="screen-page" class="page-panel active">
+          <section class="action-band">
+            <div class="field-grid compact-fields">
+              <label>选股日期<input id="screen-date" type="date" value="2026-06-02" /></label>
+              <label>读取起点<input id="screen-start-date" type="date" value="2024-01-01" /></label>
+            </div>
+            <button id="screen-button" class="primary-button" type="button">一键选出符合条件的票</button>
+          </section>
+
+          <section class="metric-grid screen-metrics" id="screen-metrics">
+            <article><span>扫描股票</span><strong>-</strong></article>
+            <article><span>读取成功</span><strong>-</strong></article>
+            <article><span>符合条件</span><strong>-</strong></article>
+            <article><span>选股日期</span><strong>-</strong></article>
+          </section>
+
+          <article class="panel">
+            <div class="panel-head"><h3>今日符合条件</h3><span id="selected-count">0 只</span></div>
+            <textarea id="selected-codes" class="selected-output" rows="3" readonly></textarea>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><h3>选股分析</h3><span id="screen-detail-count">0 条</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>代码</th><th>结果</th><th>涨幅</th><th>N2周数</th><th>回撤</th><th>现价/0.382</th><th>止损</th></tr></thead>
+                <tbody id="screen-detail-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="backtest-page" class="page-panel">
+          <form id="backtest-form" class="backtest-grid">
+            <div class="field-grid">
+              <label>回测开始<input id="backtest-start-date" type="date" value="2021-06-02" /></label>
+              <label>回测结束<input id="backtest-end-date" type="date" value="2026-06-02" /></label>
+            </div>
+
+            <div class="segmented" role="group" aria-label="调仓周期">
+              <button type="button" class="segment active" data-frequency="monthly">月度</button>
+              <button type="button" class="segment" data-frequency="yearly">年度</button>
+            </div>
+
+            <div class="field-grid">
+              <label>初始资金<input id="initial-capital" type="number" value="100000" min="1000" step="1000" /></label>
+              <label>交易成本 bps<input id="fee-bps" type="number" value="5" min="0" step="1" /></label>
+            </div>
+
+            <button id="run-button" class="primary-button" type="submit">回测这个策略 5 年表现</button>
+          </form>
+
+          <section class="metric-grid" id="metrics">
+            <article><span>总收益</span><strong>-</strong></article>
+            <article><span>年化收益</span><strong>-</strong></article>
+            <article><span>最大回撤</span><strong>-</strong></article>
+            <article><span>调仓次数</span><strong>-</strong></article>
+          </section>
+
+          <section class="chart-grid">
+            <article class="panel">
+              <div class="panel-head"><h3>资金曲线</h3><span id="equity-range">-</span></div>
+              <canvas id="equity-chart" width="900" height="320"></canvas>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h3>回撤曲线</h3><span>Drawdown</span></div>
+              <canvas id="drawdown-chart" width="900" height="320"></canvas>
+            </article>
+          </section>
+
+          <section class="table-grid">
+            <article class="panel">
+              <div class="panel-head"><h3>调仓记录</h3><span id="rebalance-count">0 条</span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>日期</th><th>持仓</th><th>期初权益</th><th>期末收益</th></tr></thead>
+                  <tbody id="rebalance-body"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head"><h3>股票池区间表现</h3><span id="symbol-count">0 只</span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>代码</th><th>K线数</th><th>起始价</th><th>结束价</th><th>区间收益</th></tr></thead>
+                  <tbody id="symbol-body"></tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
